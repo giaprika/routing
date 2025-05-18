@@ -122,7 +122,12 @@ class DVrouter(Router):
                 new_dv[dest] = best_cost
                 new_forwarding[dest] = best_port
 
-        if new_dv != self.dv:
+        changed_costs = new_dv != self.dv
+        changed_next_hops = any(
+            self.forwarding_table.get(dest) != new_forwarding.get(dest)
+            for dest in new_forwarding
+        )
+        if changed_costs or changed_next_hops:
             self.dv = new_dv
             self.forwarding_table = new_forwarding
             updated = True
@@ -133,4 +138,11 @@ class DVrouter(Router):
         """Representation for debugging in the network visualizer."""
         # TODO
         #   NOTE This method is for your own convenience and will not be graded
-        return f"DVrouter(addr={self.addr}, dv={self.dv})"
+        return (
+            f"DVrouter(addr={self.addr}, \n"
+            f"neighbors={self.neighbors}, \n"
+            f"dv={self.dv}, \n"
+            f"forwarding_table={self.forwarding_table}, \n"
+            f"received_vectors={self.received_vectors})"
+        )
+
